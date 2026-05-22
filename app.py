@@ -13,10 +13,10 @@ app.secret_key = "secretkey"
 
 # PostgreSQL Connection
 conn = psycopg2.connect(
-    host="YOUR_RENDER_HOST",
-    user="YOUR_RENDER_USER",
-    password="YOUR_RENDER_PASSWORD",
-    database="YOUR_RENDER_DATABASE",
+    host="dpg-d881i1ojo6nc73d2io00-a",
+    user="postgresql_f0ut_user",
+    password="xWJ34DZe1hfGJltFw0Of6DJwmwuxQfmx",
+    database="postgresql://postgresql_f0ut_user:xWJ34DZe1hfGJltFw0Of6DJwmwuxQfmx@dpg-d881i1ojo6nc73d2io00-a.oregon-postgres.render.com/postgresql_f0ut",
     port="5432"
 )
 
