@@ -13,10 +13,10 @@ app.secret_key = "secretkey"
 
 # PostgreSQL Connection
 conn = psycopg2.connect(
-    host="localhost",
-    user="postgres",
-    password="Yashwanth2007",
-    database="taskdb",
+    host="YOUR_RENDER_HOST",
+    user="YOUR_RENDER_USER",
+    password="YOUR_RENDER_PASSWORD",
+    database="YOUR_RENDER_DATABASE",
     port="5432"
 )
 
@@ -402,7 +402,7 @@ def api_delete_task(id):
 # Run App
 if __name__ == '__main__':
 
-    socketio.run(app, debug=True)
+    socketio.run(app, host="0.0.0.0", port=5000)
 
 
        
