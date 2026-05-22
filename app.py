@@ -8,28 +8,46 @@ import numpy as np
 
 app = Flask(__name__)
 socketio = SocketIO(app)
+
 app.secret_key = "secretkey"
+
 # PostgreSQL Connection
 conn = psycopg2.connect(
     host="localhost",
-    user="root",
+    user="postgres",
     password="Yashwanth2007",
-    database="taskdb"
+    database="taskdb",
+    port="5432"
 )
 
-cur = conn.cursor(buffered=True)
+cur = conn.cursor()
 
 # Create Table
 cur.execute("""
 
 CREATE TABLE IF NOT EXISTS tasks (
 
-    id INT AUTO_INCREMENT PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     title VARCHAR(255),
     description TEXT,
     priority VARCHAR(50),
     status VARCHAR(50),
     created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+
+)
+
+""")
+
+conn.commit()
+
+# Create Users Table
+cur.execute("""
+
+CREATE TABLE IF NOT EXISTS users (
+
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(100) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL
 
 )
 
