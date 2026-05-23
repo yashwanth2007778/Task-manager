@@ -39,7 +39,13 @@ CREATE TABLE IF NOT EXISTS tasks (
 """)
 
 conn.commit()
+# Login Protection Helper
+def login_required():
 
+    if 'user' not in session:
+        return False
+
+    return True
 # Create Users Table
 cur.execute("""
 
@@ -54,6 +60,7 @@ CREATE TABLE IF NOT EXISTS users (
 """)
 
 conn.commit()
+
 # Register
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -66,6 +73,23 @@ def register():
             request.form['password']
         )
 
+        # Check existing user
+        cur.execute(
+            "SELECT * FROM users WHERE username=%s",
+            (username,)
+        )
+
+        existing_user = cur.fetchone()
+
+        if existing_user:
+
+            flash(
+                "Username already exists!",
+                "danger"
+            )
+
+            return redirect('/register')
+
         query = """
         INSERT INTO users (username, password)
         VALUES (%s, %s)
@@ -74,6 +98,11 @@ def register():
         cur.execute(query, (username, password))
 
         conn.commit()
+
+        flash(
+            "Registration Successful!",
+            "success"
+        )
 
         return redirect('/login')
 
@@ -177,6 +206,9 @@ def index():
 @app.route('/add', methods=['POST'])
 def add_task():
 
+    if not login_required():
+        return redirect('/login')
+
     title = request.form['title']
 
     description = request.form['description']
@@ -207,10 +239,15 @@ def add_task():
         'message': 'New task added'
     })
 
+    flash("Task Added Successfully!", "success")
+
     return redirect('/')
     # Edit Task
 @app.route('/edit/<int:id>', methods=['GET', 'POST'])
 def edit_task(id):
+
+    if not login_required():
+        return redirect('/login')
 
     if request.method == 'POST':
 
@@ -243,6 +280,8 @@ def edit_task(id):
             'message': 'Task updated'
         })
 
+        flash("Task Updated Successfully!", "success")
+
         return redirect('/')
 
     query = "SELECT * FROM tasks WHERE id=%s"
@@ -258,6 +297,9 @@ def edit_task(id):
     # Complete Task
 @app.route('/complete/<int:id>')
 def complete_task(id):
+
+    if not login_required():
+        return redirect('/login')
 
     query = """
 
@@ -275,11 +317,16 @@ def complete_task(id):
         'message': 'Task completed'
     })
 
+    flash("Task Completed!", "success")
+
     return redirect('/')
 # Delete Task
 
 @app.route('/delete/<int:id>')
 def delete_task(id):
+
+    if not login_required():
+        return redirect('/login')
 
     query = """
 
@@ -295,6 +342,8 @@ def delete_task(id):
     socketio.emit('task_update', {
         'message': 'Task deleted'
     })
+
+    flash("Task Deleted!", "danger")
 
     return redirect('/')
 # API - Get All Tasks
@@ -400,18 +449,17 @@ def api_delete_task(id):
         "message": "Task deleted"
     })
 # Run App
-if __name__ == '__main__':
-
+if __name__ == "__main__":
     import os
 
-if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
+
     socketio.run(
         app,
         host="0.0.0.0",
         port=port,
+        debug=True,
         allow_unsafe_werkzeug=True
     )
-
 
        
